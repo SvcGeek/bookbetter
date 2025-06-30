@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BookBetter.com - Dive into Your Dream Vacation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {          colors: {
+            primary: '#1e40af', /* Blu reale, evoca fiducia e affidabilità */
+            secondary: '#0ea5e9', /* Celeste, trasmette freschezza e relax */
+            accent: '#f97316', /* Arancione brillante, per stimolare l'azione e l'energia */
+            warmAccent: '#ec4899', /* Rosa caldo, per esperienze romantiche */
+            success: '#059669', /* Verde smeraldo, per segnalare sicurezza e convenienza */
+            neutral: '#f1f5f9', /* Un bianco leggermente più caldo */
+            dark: '#0f172a', /* Blu molto scuro per contrasti più morbidi rispetto al nero puro */
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        }
+      }
+    }  </script>  <style>
+    /* Stili personalizzati per gli input del form */
+    .search-form input {
+      border: 2px solid #f97316 !important; /* Bordo arancione */
+      color: #f97316 !important; /* Testo inserito arancione */
+    }
+      /* Stile per il focus arancione */
+    .search-form input:focus {
+      outline: none;
+      border-color: #f97316 !important;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3) !important;
+    }
+    
+    /* Stile per i placeholder grigi */
+    .search-form input::placeholder {
+      color: #9ca3af !important; /* Placeholder grigio chiaro (gray-400) */
+      opacity: 1;
+    }
+    
+    /* Stile per i placeholder delle date (che usano ::-webkit-input-placeholder) */
+    .search-form input[type="date"]::-webkit-datetime-edit {
+      color: #9ca3af !important;
+    }
+    
+    /* Quando è selezionato un valore, lo colora di arancione */
+    .search-form input[type="date"]:valid {
+      color: #f97316 !important;
+    }
+    
+    /* Supporto cross-browser per i placeholder */
+    .search-form input:-ms-input-placeholder,
+    .search-form input::-ms-input-placeholder {
+      color: #9ca3af !important;
+    }
+    
+    /* Stile per le popular search suggestions */
+    .popular-link {
+      border: 1px solid #1e40af;
+      border-radius: 0.25rem;
+      padding: 0.125rem 0.5rem;
+      transition: all 0.2s ease;
+    }
+      /* Nasconde l'icona del calendario predefinita ma mantiene la funzionalità */
+    .search-form input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      right: 0;
+      top: 0;
+      cursor: pointer;
+    }
+    
+    .search-form input[type="date"]::-webkit-inner-spin-button,
+    .search-form input[type="date"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    /* Stile originale */
+    .hover-shine {
+      position: relative;
+      overflow: hidden;
+    }
+    .hover-shine::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 100%);
+      transform: skewX(-25deg);
+      transition: all 0.75s;
+    }
+    .hover-shine:hover::before {
+      left: 125%;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translate3d(0, 30px, 0);
+      }
+      to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    
+    /* Custom style for placeholder text in orange */
+    ::placeholder {
+      color: #f97316 !important; /* Colore accent/orange-500 */
+      opacity: 1;
+    }
+    :-ms-input-placeholder {
+      color: #f97316 !important;
+    }
+    ::-ms-input-placeholder {
+      color: #f97316 !important;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+<body class="bg-neutral text-dark font-sans">
+ <!-- Header with simplified navigation -->
+<header class="bg-gradient-to-r from-primary to-secondary text-white shadow-lg">
+  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+    <div class="flex items-center">
+      <h1 class="text-xl md:text-2xl font-bold">BookBetter.com</h1>
+    </div>
+    <!-- Mobile menu button -->
+    <button id="mobile-menu-btn" class="md:hidden focus:outline-none">
+      <i class="fas fa-bars text-xl"></i>
+    </button>
+    <!-- Desktop navigation -->
+    <nav class="hidden md:flex space-x-4 lg:space-x-6">
+      <a href="#" class="font-medium hover:text-black transition duration-200 flex items-center text-sm lg:text-base">
+        <i class="fas fa-hotel mr-1 lg:mr-2"></i>
+        Stays
+      </a>
+      <a href="#" class="font-medium hover:text-black transition duration-200 flex items-center text-sm lg:text-base">
+        <i class="fas fa-plane mr-1 lg:mr-2"></i>
+        Flights
+      </a>
+      <a href="#" class="font-medium hover:text-black transition duration-200 flex items-center text-sm lg:text-base">
+        <i class="fas fa-car mr-1 lg:mr-2"></i>
+        Car Rentals
+      </a>
+      <a href="#" class="font-medium hover:text-black transition duration-200 flex items-center text-sm lg:text-base">
+        <i class="fas fa-monument mr-1 lg:mr-2"></i>
+        Attractions
+      </a>
+      <a href="#" class="font-medium hover:text-black transition duration-200 flex items-center text-sm lg:text-base">
+        <i class="fas fa-taxi mr-1 lg:mr-2"></i>
+        Airport Taxis
+      </a>
+    </nav>
+  </div>
+  <!-- Mobile menu (hidden by default) -->
+  <div id="mobile-menu" class="md:hidden bg-primary/90 border-t border-white/20 hidden">
+    <div class="px-4 py-2 space-y-1">
+      <a href="#" class="block py-2 px-3 rounded font-medium hover:bg-white/10 transition duration-200">
+        <i class="fas fa-hotel mr-2"></i>Stays
+      </a>
+      <a href="#" class="block py-2 px-3 rounded font-medium hover:bg-white/10 transition duration-200">
+        <i class="fas fa-plane mr-2"></i>Flights
+      </a>
+      <a href="#" class="block py-2 px-3 rounded font-medium hover:bg-white/10 transition duration-200">
+        <i class="fas fa-car mr-2"></i>Car Rentals
+      </a>
+      <a href="#" class="block py-2 px-3 rounded font-medium hover:bg-white/10 transition duration-200">
+        <i class="fas fa-monument mr-2"></i>Attractions
+      </a>
+      <a href="#" class="block py-2 px-3 rounded font-medium hover:bg-white/10 transition duration-200">
+        <i class="fas fa-taxi mr-2"></i>Airport Taxis
+      </a>
+    </div>
+  </div>
+</header>
+  <!-- Hero section with improved search UX -->  
+  <section class="relative bg-cover bg-center h-[70vh] sm:h-[80vh]" style="background-image: linear-gradient(rgba(15, 23, 42, 0.3), rgba(15, 23, 42, 0.3)), url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1600&q=90')">
+    <div class="absolute inset-0 bg-gradient-to-b from-dark/50 via-dark/30 to-dark/60"></div>
+    <div class="absolute -bottom-1 left-0 right-0 h-24 bg-gradient-to-t from-neutral to-transparent"></div>
+    <div class="relative container mx-auto px-4 h-full flex flex-col justify-center items-center text-center text-white">      
+      <div class="animate-pulse inline-block bg-accent/90 text-white text-xs sm:text-sm font-bold px-4 sm:px-6 py-2 rounded-full mb-4 shadow-lg shadow-orange-500/20">Limited Time: Up to 40% Off</div>
+      <h2 class="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 max-w-2xl leading-tight">Turn Your Dreams On.</h2>
+      <p class="text-lg sm:text-xl mb-6 sm:mb-8 max-w-xl text-white/90 px-4">Life is short, the world is vast. Today is the perfect moment to begin your next adventure.</p>
+        
+      <!-- Enhanced search box with visual feedback -->
+      <div class="w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden mx-4">
+        <div class="p-4 sm:p-6 space-y-4 search-form">
+          <div class="flex flex-col space-y-4">
+            <!-- Search input - full width on mobile -->
+            <div class="w-full">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <i class="fas fa-search text-gray-400"></i>
+                </div>           
+                <input type="text" id="autoTypingInput" class="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent placeholder-orange-500" 
+                  placeholder="Where are you going?" />
+              </div>
+            </div>
+            
+            <!-- Date inputs and search button -->
+            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+              <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <i class="far fa-calendar text-gray-400"></i>
+                </div>
+                <input type="date" id="checkInDate" class="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Check-in date" />
+              </div>
+              <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <i class="far fa-calendar text-gray-400"></i>
+                </div>
+                <input type="date" class="pl-10 w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Check-out date" />
+              </div>       
+              <button class="bg-accent hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center shadow-lg shadow-orange-200 hover:shadow-orange-300 transform hover:-translate-y-0.5 w-full sm:w-auto">
+                <i class="fas fa-search mr-2"></i>
+                Search
+              </button>
+            </div>
+          </div>            <!-- Popular search suggestions and SVC badge in a flex container -->
+          <div class="flex flex-col space-y-4 pt-2">
+            <!-- Popular searches -->
+            <div class="flex flex-wrap gap-2 justify-center sm:justify-start">              
+              <span class="text-sm text-gray-600">Popular:</span>
+              <a href="#" class="text-sm text-primary hover:underline popular-link">Rome</a>
+              <a href="#" class="text-sm text-primary hover:underline popular-link">Paris</a>
+              <a href="#" class="text-sm text-primary hover:underline popular-link">London</a>
+              <a href="#" class="text-sm text-primary hover:underline popular-link">New York</a>
+            </div>
+            
+            <!-- SVC discount badge -->
+            <div class="flex items-center justify-center sm:justify-end">
+              <div class="flex items-center p-2 bg-blue-50 rounded-lg">
+                <div class="flex-shrink-0 mr-2">
+                  <div class="relative">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded flex items-center justify-center">
+                      <span class="text-white font-bold text-xs sm:text-sm">SVC</span>
+                    </div>
+                    <div class="absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-yellow-400 rounded-full"></div>
+                    <div class="absolute -bottom-1 -left-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-yellow-400 rounded-full"></div>
+                  </div>
+                </div>
+                <div class="text-left">
+                  <p class="text-xs sm:text-sm font-medium text-gray-800">Look for the <span class="font-bold text-blue-600">SVC</span> logo</p>
+                  <p class="text-xs text-gray-600">10%+ discounts for logged-in users</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Compact Trust badges section inside search container - only visible on desktop -->
+          <div class="hidden md:grid grid-cols-3 gap-x-2 sm:gap-x-6 pt-4 mt-4 border-t border-gray-100 w-full">
+            <!-- Best Price Badge -->
+            <div class="flex flex-col items-center group">
+              <div class="bg-blue-50 p-2 rounded-full shadow-sm">
+                <i class="fas fa-tag text-sm sm:text-lg text-primary group-hover:scale-110 transition-transform"></i>
+              </div>
+              <h3 class="text-xs sm:text-sm font-semibold text-primary mt-1 text-center">Best Price</h3>
+              
+              <!-- Tooltip only on desktop -->
+              <div class="hidden md:block group-hover:opacity-100 opacity-0 absolute mt-1 bg-primary text-white text-xs p-2 rounded shadow-lg pointer-events-none transition-all z-20">Our price guarantee!</div>
+            </div>
+            
+            <!-- Free Cancellation Badge -->
+            <div class="flex flex-col items-center group">
+              <div class="bg-blue-50 p-2 rounded-full shadow-sm">
+                <i class="fas fa-calendar-check text-sm sm:text-lg text-secondary group-hover:scale-110 transition-transform"></i>
+              </div>
+              <h3 class="text-xs sm:text-sm font-semibold text-secondary mt-1 text-center">Free Cancellation</h3>
+              
+              <!-- Tooltip only on desktop -->
+              <div class="hidden md:block group-hover:opacity-100 opacity-0 absolute mt-1 bg-secondary text-white text-xs p-2 rounded shadow-lg pointer-events-none transition-all z-20">Flexible cancellation!</div>
+            </div>
+            
+            <!-- Verified Reviews Badge -->
+            <div class="flex flex-col items-center group">
+              <div class="bg-blue-50 p-2 rounded-full shadow-sm">
+                <i class="fas fa-star text-sm sm:text-lg text-accent group-hover:scale-110 transition-transform"></i>
+              </div>
+              <h3 class="text-xs sm:text-sm font-semibold text-accent mt-1 text-center">Verified Reviews</h3>
+              
+              <!-- Tooltip only on desktop -->
+              <div class="hidden md:block group-hover:opacity-100 opacity-0 absolute mt-1 bg-accent text-white text-xs p-2 rounded shadow-lg pointer-events-none transition-all z-20">100M+ verified reviews!</div>
+            </div>
+          </div>
+        </div>      
+      </div>
+    </div>
+  </section>
+  <!-- Featured destinations - more engaging and interactive -->  
+  <section class="py-12 sm:py-16 bg-gradient-to-b from-neutral to-white relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-40 h-40 bg-primary/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="absolute bottom-0 right-0 w-60 h-60 bg-accent/10 rounded-full translate-x-1/3 translate-y-1/4"></div>
+    <div class="absolute top-40 right-20 w-20 h-20 bg-secondary/10 rounded-full"></div>
+    <div class="container mx-auto px-4 relative">
+      <!-- Mobile/Tablet Trust Badges -->
+      <div class="md:hidden mb-8">
+        <h4 class="text-center text-sm font-medium text-gray-500 mb-4">Why book with us</h4>
+        <div class="grid grid-cols-3 gap-x-2 sm:gap-x-6 w-full">
+          <!-- Best Price Badge -->
+          <div class="flex flex-col items-center">
+            <div class="bg-blue-50 p-2 rounded-full shadow-sm">
+              <i class="fas fa-tag text-sm sm:text-lg text-primary"></i>
+            </div>
+            <h3 class="text-xs sm:text-sm font-semibold text-primary mt-1 text-center">Best Price</h3>
+            <p class="text-[10px] text-gray-500 text-center mt-0.5">Price guarantee</p>
+          </div>
+          
+          <!-- Free Cancellation Badge -->
+          <div class="flex flex-col items-center">
+            <div class="bg-blue-50 p-2 rounded-full shadow-sm">
+              <i class="fas fa-calendar-check text-sm sm:text-lg text-secondary"></i>
+            </div>
+            <h3 class="text-xs sm:text-sm font-semibold text-secondary mt-1 text-center">Free Cancellation</h3>
+            <p class="text-[10px] text-gray-500 text-center mt-0.5">Most bookings</p>
+          </div>
+          
+          <!-- Verified Reviews Badge -->
+          <div class="flex flex-col items-center">
+            <div class="bg-blue-50 p-2 rounded-full shadow-sm">
+              <i class="fas fa-star text-sm sm:text-lg text-accent"></i>
+            </div>
+            <h3 class="text-xs sm:text-sm font-semibold text-accent mt-1 text-center">Verified Reviews</h3>
+            <p class="text-[10px] text-gray-500 text-center mt-0.5">100M+ reviews</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col items-center mb-3">
+        <span class="text-xs sm:text-sm text-secondary font-medium uppercase tracking-wider">Explore The World</span>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-dark">Trending Destinations</h2>
+        <div class="w-20 h-1 bg-secondary rounded my-4"></div>
+      </div>
+      <p class="text-gray-600 text-center mb-8 sm:mb-10 max-w-xl mx-auto px-4">Join thousands of travelers and discover these extraordinary places that are capturing everyone's imagination right now</p>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">        <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 group hover:-translate-y-1 opacity-0 transform translate-y-4" style="animation: fadeInUp 0.5s 0.1s forwards;">
+          <div class="relative h-40 sm:h-48 overflow-hidden hover-shine">            
+            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80" 
+                alt="Rome" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" />
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 sm:p-4">
+              <h4 class="text-white text-lg sm:text-xl font-bold">Rome, Italy</h4>
+              <p class="text-white/90 text-xs sm:text-sm">4,287 properties</p>
+            </div>
+          </div>
+          <div class="p-3 sm:p-4">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-xs sm:text-sm font-medium">4.8 (2,345 reviews)</span>
+              </div>
+              <span class="text-xs sm:text-sm font-bold text-accent">From $89</span>
+            </div>
+          </div>
+        </div>
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 group hover:-translate-y-1 opacity-0 transform translate-y-4" style="animation: fadeInUp 0.5s 0.2s forwards;">
+          <div class="relative h-40 sm:h-48 overflow-hidden hover-shine">
+            <img src="https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=600&q=80" 
+                alt="Paris" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" />
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 sm:p-4">
+              <h4 class="text-white text-lg sm:text-xl font-bold">Paris, France</h4>
+              <p class="text-white/90 text-xs sm:text-sm">3,856 properties</p>
+            </div>
+          </div>
+          <div class="p-3 sm:p-4">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-xs sm:text-sm font-medium">4.7 (3,129 reviews)</span>
+              </div>
+              <span class="text-xs sm:text-sm font-bold text-accent">From $112</span>
+            </div>
+          </div>
+        </div>
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 group hover:-translate-y-1 opacity-0 transform translate-y-4" style="animation: fadeInUp 0.5s 0.3s forwards;">
+          <div class="relative h-40 sm:h-48 overflow-hidden hover-shine">
+            <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80" 
+                alt="New York" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" />
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 sm:p-4">
+              <h4 class="text-white text-lg sm:text-xl font-bold">New York, USA</h4>
+              <p class="text-white/90 text-xs sm:text-sm">2,954 properties</p>
+            </div>
+          </div>
+          <div class="p-3 sm:p-4">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-xs sm:text-sm font-medium">4.6 (5,673 reviews)</span>
+              </div>
+              <span class="text-xs sm:text-sm font-bold text-accent">From $159</span>
+            </div>
+          </div>
+        </div>
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 group hover:-translate-y-1 opacity-0 transform translate-y-4" style="animation: fadeInUp 0.5s 0.4s forwards;">
+          <div class="relative h-40 sm:h-48 overflow-hidden hover-shine">            
+            <img src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80" 
+                alt="Tokyo" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" />
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 sm:p-4">
+              <h4 class="text-white text-lg sm:text-xl font-bold">Tokyo, Japan</h4>
+              <p class="text-white/90 text-xs sm:text-sm">3,271 properties</p>
+            </div>
+          </div>
+          <div class="p-3 sm:p-4">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-xs sm:text-sm font-medium">4.9 (4,218 reviews)</span>
+              </div>
+              <span class="text-xs sm:text-sm font-bold text-accent">From $135</span>
+            </div>
+          </div>
+        </div>      </div>          <div class="text-center mt-6 sm:mt-8 mb-8 sm:mb-12">        
+        <div class="inline-flex items-center relative">
+          <div class="absolute -top-6 sm:-top-7 -right-6 sm:-right-7 w-12 h-12 sm:w-14 sm:h-14 animate-pulse-slow z-20">
+            <div class="absolute inset-0 rounded-full bg-accent opacity-20 animate-ping"></div>
+            <div class="absolute top-0 right-0 rounded-full bg-accent text-white text-xs font-bold p-1 transform rotate-12 px-1.5 sm:px-2 z-20">
+              24h left!
+            </div>
+          </div>
+          <button class="bg-secondary hover:bg-blue-500 text-white font-medium py-3 px-6 sm:px-8 rounded-lg transition-all duration-300 group relative overflow-hidden shadow-lg shadow-blue-400/10 hover:shadow-blue-400/20 hover:-translate-y-1 text-sm sm:text-base">
+            <span class="relative z-10">Explore all destinations</span>
+            <div class="absolute inset-0 h-full w-full scale-0 rounded-lg transition-all duration-300 group-hover:scale-100 group-hover:bg-blue-400/20"></div>
+          </button>
+        </div>
+      </div>
+        <!-- More Vacation Ideas with different preferences and price points -->
+      <div class="relative">
+        <div class="flex flex-col items-center">
+          <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-center">Vacation Inspiration</h3>
+          <span class="text-xs sm:text-sm text-primary font-medium uppercase tracking-wider">Personalized For You</span>
+          <div class="w-16 h-1 bg-primary rounded my-3"></div>
+          <p class="text-gray-600 text-center max-w-2xl mx-auto mb-6 sm:mb-8 px-4">Whatever your travel style or budget, we've curated amazing experiences just for you. Ready to turn your dream vacation into reality?</p>
+        </div>
+          
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
+          <!-- Budget-friendly options -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80" 
+                  alt="Budget Travel" class="w-full h-48 sm:h-60 object-cover transition duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
+                <div class="bg-accent/90 text-white px-2 py-1 rounded text-xs font-bold inline-block w-fit mb-2">BUDGET FRIENDLY</div>
+                <h4 class="text-white text-lg sm:text-xl font-bold">Amazing Deals Under $75</h4>
+                <p class="text-white/80 mt-1 text-sm">Incredible stays that won't break the bank</p>
+              </div>
+            </div>
+            <div class="p-3 sm:p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs bg-green-100 text-success px-2 py-1 rounded-full">Save up to 30%</span>
+                <a href="#" class="text-primary hover:underline text-xs sm:text-sm font-medium group-hover:text-accent transition-colors">View deals</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Luxury experiences -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=80" 
+                  alt="Luxury Travel" class="w-full h-48 sm:h-60 object-cover transition duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
+                <div class="bg-secondary/90 text-white px-2 py-1 rounded text-xs font-bold inline-block w-fit mb-2">LUXURY</div>
+                <h4 class="text-white text-lg sm:text-xl font-bold">5-Star Experiences</h4>
+                <p class="text-white/80 mt-1 text-sm">Treat yourself to the ultimate getaway</p>
+              </div>
+            </div>
+            <div class="p-3 sm:p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs bg-blue-100 text-secondary/90 px-2 py-1 rounded-full">Free upgrades</span>
+                <a href="#" class="text-primary hover:underline text-xs sm:text-sm font-medium group-hover:text-accent transition-colors">Discover luxury</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Family-friendly options -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1563911302283-d2bc129e7570?auto=format&fit=crop&w=800&q=80" 
+                  alt="Family Travel" class="w-full h-48 sm:h-60 object-cover transition duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
+                <div class="bg-success/90 text-white px-2 py-1 rounded text-xs font-bold inline-block w-fit mb-2">FAMILY FRIENDLY</div>
+                <h4 class="text-white text-lg sm:text-xl font-bold">Perfect for Families</h4>
+                <p class="text-white/80 mt-1 text-sm">Kid-approved stays with activities for all ages</p>
+              </div>
+            </div>
+            <div class="p-3 sm:p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs bg-green-100 text-success px-2 py-1 rounded-full">Kids stay free</span>
+                <a href="#" class="text-primary hover:underline text-xs sm:text-sm font-medium group-hover:text-accent transition-colors">Family packages</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Seconda riga di opzioni per ispirazioni di vacanza -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
+          <!-- Romantic getaways -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">            
+            <div class="relative">              
+              <img src="https://images.unsplash.com/photo-1560750588-73207b1ef5b8?auto=format&fit=crop&w=800&q=80" 
+                  alt="Romantic Getaway" class="w-full h-48 sm:h-60 object-cover object-center transition duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
+                <div class="bg-warmAccent/90 text-white px-2 py-1 rounded text-xs font-bold inline-block w-fit mb-2">ROMANTIC</div>
+                <h4 class="text-white text-lg sm:text-xl font-bold">Unforgettable Honeymoons</h4>
+                <p class="text-white/80 mt-1 text-sm">The perfect setting for your love story</p>
+              </div>
+            </div>
+            <div class="p-3 sm:p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs bg-pink-100 text-warmAccent px-2 py-1 rounded-full">Champagne on arrival</span>
+                <a href="#" class="text-primary hover:underline text-xs sm:text-sm font-medium group-hover:text-warmAccent transition-colors">Book romance</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Adventure travel -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1570641963303-92ce4845ed4c?auto=format&fit=crop&w=800&q=80" 
+                  alt="Adventure Travel" class="w-full h-48 sm:h-60 object-cover transition duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
+                <div class="bg-accent/90 text-white px-2 py-1 rounded text-xs font-bold inline-block w-fit mb-2">ADVENTURE</div>
+                <h4 class="text-white text-lg sm:text-xl font-bold">Thrill-Seeking Escapes</h4>
+                <p class="text-white/80 mt-1 text-sm">Unforgettable experiences for adrenaline junkies</p>
+              </div>
+            </div>
+            <div class="p-3 sm:p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs bg-orange-100 text-accent/90 px-2 py-1 rounded-full">Activity included</span>
+                <a href="#" class="text-primary hover:underline text-xs sm:text-sm font-medium group-hover:text-accent transition-colors">Find adventures</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Beach resorts -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1573843981267-be1999ff37cd?auto=format&fit=crop&w=800&q=80" 
+                  alt="Beach Resort" class="w-full h-48 sm:h-60 object-cover transition duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
+                <div class="bg-secondary/90 text-white px-2 py-1 rounded text-xs font-bold inline-block w-fit mb-2">BEACH RESORT</div>
+                <h4 class="text-white text-lg sm:text-xl font-bold">Paradise Beaches</h4>
+                <p class="text-white/80 mt-1 text-sm">Crystal clear waters and white sandy beaches</p>
+              </div>
+            </div>
+            <div class="p-3 sm:p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs bg-blue-100 text-secondary px-2 py-1 rounded-full">Beachfront access</span>
+                <a href="#" class="text-primary hover:underline text-xs sm:text-sm font-medium group-hover:text-secondary transition-colors">Beach escapes</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Terza riga di opzioni per ispirazioni di vacanza -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <!-- Cultural experiences -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1513581166391-887a96ddeafd?auto=format&fit=crop&w=800&q=80" 
+                  alt="Cultural Experience" class="w-full h-48 sm:h-60 object-cover transition duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
+                <div class="bg-primary/90 text-white px-2 py-1 rounded text-xs font-bold inline-block w-fit mb-2">CULTURAL</div>
+                <h4 class="text-white text-lg sm:text-xl font-bold">Heritage Explorations</h4>
+                <p class="text-white/80 mt-1 text-sm">Immerse yourself in local cultures and traditions</p>
+              </div>
+            </div>
+            <div class="p-3 sm:p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs bg-indigo-100 text-primary px-2 py-1 rounded-full">Guided tours included</span>
+                <a href="#" class="text-primary hover:underline text-xs sm:text-sm font-medium group-hover:text-accent transition-colors">Explore culture</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Wellness retreats -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80" 
+                  alt="Wellness Retreat" class="w-full h-48 sm:h-60 object-cover transition duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
+                <div class="bg-success/90 text-white px-2 py-1 rounded text-xs font-bold inline-block w-fit mb-2">WELLNESS</div>
+                <h4 class="text-white text-lg sm:text-xl font-bold">Rejuvenating Retreats</h4>
+                <p class="text-white/80 mt-1 text-sm">Find balance and restore your energy</p>
+              </div>
+            </div>
+            <div class="p-3 sm:p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs bg-green-100 text-success px-2 py-1 rounded-full">Spa credits</span>
+                <a href="#" class="text-primary hover:underline text-xs sm:text-sm font-medium group-hover:text-success transition-colors">Find wellness</a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Seasonal specials -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
+            <div class="relative">
+              <img src="https://images.unsplash.com/photo-1601134467661-3d775b999c8b?auto=format&fit=crop&w=800&q=80" 
+                  alt="Christmas Special" class="w-full h-48 sm:h-60 object-cover transition duration-500 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 sm:p-6">
+                <div class="bg-warmAccent/90 text-white px-2 py-1 rounded text-xs font-bold inline-block w-fit mb-2">SEASONAL</div>
+                <h4 class="text-white text-lg sm:text-xl font-bold">Festive Celebrations</h4>
+                <p class="text-white/80 mt-1 text-sm">Special holiday packages for memorable moments</p>
+              </div>
+            </div>
+            <div class="p-3 sm:p-4">
+              <div class="flex items-center justify-between">
+                <span class="text-xs bg-pink-100 text-warmAccent px-2 py-1 rounded-full">Holiday perks</span>
+                <a href="#" class="text-primary hover:underline text-xs sm:text-sm font-medium group-hover:text-warmAccent transition-colors">Special offers</a>
+              </div>
+            </div>
+          </div>        
+        </div>
+      </div>
+    </section>
+  
+
+  <!-- Newsletter signup with value proposition -->
+  <section class="py-12 sm:py-16 bg-gradient-to-r from-primary to-secondary text-white relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-full opacity-10">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="absolute top-0">
+        <path fill="#ffffff" fill-opacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,186.7C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+      </svg>
+    </div>
+    <div class="container mx-auto px-4 text-center relative z-10">
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Get Exclusive Travel Deals</h2>
+      <p class="mb-6 max-w-xl mx-auto text-sm sm:text-base">Subscribe to our newsletter and receive personalized offers, travel tips, and early access to our best deals.</p>
+      <div class="max-w-md mx-auto flex flex-col sm:flex-row gap-3">
+        <input type="email" placeholder="Your email address" class="flex-grow px-4 py-3 rounded-lg sm:rounded-r-none text-gray-800 focus:outline-none focus:ring-2 focus:ring-accent border-0 shadow-md text-sm sm:text-base" />
+        <button class="bg-accent hover:bg-orange-500 text-white font-bold py-3 px-6 rounded-lg sm:rounded-l-none transition-all duration-300 transform hover:-translate-y-1 shadow-lg shadow-orange-600/20 text-sm sm:text-base">
+          Subscribe
+        </button>
+      </div>
+      <p class="text-xs sm:text-sm mt-4 text-blue-100">We respect your privacy. Unsubscribe at any time.</p>
+    </div>
+  </section>
+
+  <!-- Footer with improved navigation -->
+  <footer class="bg-gray-900 text-gray-300 py-8 sm:py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8">
+        <div class="col-span-1 sm:col-span-2">
+          <h3 class="text-lg sm:text-xl font-bold text-white mb-4">BookBetter.com</h3>
+          <p class="mb-4" id="disclaimer">Making travel planning simple, affordable, and enjoyable for everyone.</p>
+          <p class="text-accent mb-4 text-sm">This website is only an exercise to support the Public Speaking course.</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-bold text-white mb-4">Company</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">About Us</a></li>
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Careers</a></li>
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Press</a></li>
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Sustainability</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-white mb-4">Support</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Help Center</a></li>
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Safety Information</a></li>
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Cancellation Options</a></li>
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-white mb-4">Legal</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Terms & Conditions</a></li>
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Cookie Policy</a></li>
+            <li><a href="#" class="hover:text-white transition duration-200 text-sm">Site Map</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 mt-6 sm:mt-8 pt-6 sm:pt-8 flex flex-col md:flex-row justify-between items-center">
+        <p class="text-xs sm:text-sm mb-4 md:mb-0">© 2025 Booking.com. All rights reserved.</p>
+        <div class="flex space-x-4">
+          <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" alt="Visa" class="h-6 sm:h-8 w-auto" />
+          <img src="https://cdn-icons-png.flaticon.com/512/196/196561.png" alt="MasterCard" class="h-6 sm:h-8 w-auto" />
+          <img src="https://cdn-icons-png.flaticon.com/512/196/196565.png" alt="PayPal" class="h-6 sm:h-8 w-auto" />
+          <img src="https://cdn-icons-png.flaticon.com/512/196/196539.png" alt="American Express" class="h-6 sm:h-8 w-auto" />
+        </div>
+      </div>    </div>
+  </footer>
+  <!-- Script per impostare la data di domani nel campo check-in -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Calcola la data di domani
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      // Formatta la data in YYYY-MM-DD per l'input type="date"
+      const year = tomorrow.getFullYear();
+      const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+      const day = String(tomorrow.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      
+      // Imposta la data nel campo check-in
+      document.getElementById('checkInDate').value = formattedDate;
+    });
+  </script>
+  
+  <!-- Script per l'effetto di digitazione automatica nel campo di ricerca -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputElement = document.getElementById('autoTypingInput');
+      
+      // Idee di viaggio da mostrare nel loop
+      const travelIdeas = [
+        "Una spiaggia paradisiaca a Bali...",
+        "Un tour culturale a Kyoto...",
+        "Trekking sulle Dolomiti...",
+        "Safari in Tanzania...",
+        "Weekend romantico a Parigi...",
+        "Vacanza in famiglia a Disney World...",
+        "Avventura in Islanda...",
+        "Tour gastronomico in Italia...",
+        "Relax in una spa in Toscana...",
+        "Partiamo per l'avventura! " // Ultima frase che rimane più a lungo
+      ];
+      
+      let currentIndex = 0;
+      let isDeleting = false;
+      let text = '';
+      let charIndex = 0;
+      
+      // Tempo in ms per ogni carattere
+      const typingSpeed = 80;
+      const deletingSpeed = 40;
+      const normalPause = 1500;
+      const longPause = 3500;
+      
+      function typeEffect() {
+        const currentText = travelIdeas[currentIndex];
+        
+        if (isDeleting) {
+          // Cancellazione del testo
+          text = currentText.substring(0, charIndex - 1);
+          charIndex--;
+        } else {
+          // Digitazione del testo
+          text = currentText.substring(0, charIndex + 1);
+          charIndex++;
+        }
+        
+        // Aggiorna il campo input
+        inputElement.value = text;
+        inputElement.placeholder = "Cerca la tua prossima destinazione...";
+        
+        // Velocità di esecuzione
+        let speed = isDeleting ? deletingSpeed : typingSpeed;
+        
+        // Se ha finito di digitare il testo corrente
+        if (!isDeleting && text === currentText) {
+          speed = currentText === travelIdeas[travelIdeas.length - 1] ? longPause : normalPause;
+          isDeleting = true;
+        } 
+        // Se ha finito di cancellare il testo
+        else if (isDeleting && text === '') {
+          isDeleting = false;
+          currentIndex = (currentIndex + 1) % travelIdeas.length;
+        }
+        
+        setTimeout(typeEffect, speed);
+      }
+      
+      // Avvia l'effetto di digitazione
+      typeEffect();
+    });
+  </script>
+  <!-- Script per il menu mobile -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', function() {
+          mobileMenu.classList.toggle('hidden');
+          
+          // Cambia l'icona del menu
+          const icon = mobileMenuBtn.querySelector('i');
+          if (mobileMenu.classList.contains('hidden')) {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+          } else {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
